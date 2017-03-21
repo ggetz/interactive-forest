@@ -1,17 +1,18 @@
 #include "Mesh.h"
+#include <iostream>
 
 
 Mesh::Mesh()
 {
 	Mesh(vec4(0, 0, 0, 1),
 		vector<vec4>(),
-		vector<int>(),
+		vector<unsigned int>(),
 		vector<vec3>(),
 		vector<vec2>());
 }
 
 
-Mesh::Mesh(vec4 origin, vector<vec4> verts, vector<int> faces, vector<vec3> normals, vector<vec2> uvs)
+Mesh::Mesh(vec4 origin, vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs)
 {
 	_origin = origin;
 
@@ -65,7 +66,7 @@ void Mesh::init()
 		&_uvs.front());
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffers[1]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * _faces.size(), &_faces.front(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * _faces.size(), &_faces.front(), GL_STATIC_DRAW);
 
 	// Bind index arrays
 	glUseProgram(_program);
@@ -88,8 +89,6 @@ void Mesh::init()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -145,7 +144,9 @@ void Mesh::draw(Camera camera, DirectionalLight light)
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	glUniform1i(glGetUniformLocation(_program, "textureID"), 0);
 
-	glDrawElements(GL_TRIANGLES, _verts.size(), GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
+	glEnable(GL_DEPTH_TEST);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffers[1]);
+	glDrawElements(GL_TRIANGLES, _faces.size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
 

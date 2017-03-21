@@ -11,6 +11,8 @@ public:
 		diffuse = vec4(0.5, 0.5, 0.5, 1.0);
 		specular = vec4(1.0, 1.0, 1.0, 1.0);
 		shininess = 6.0;
+		texturePath = "";
+		textureSize = 512;
 	}
 
 	vec4 ambient;

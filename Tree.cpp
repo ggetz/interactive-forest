@@ -69,7 +69,7 @@ void Tree::calcNormals()
 			total += allNormals[i][j] / length;
 		}
 
-		_normals[i] = total;
+		_normals.push_back(total);
 	}
 }
 
@@ -171,8 +171,8 @@ void Tree::createTwigs(Branch* branch)
 		_facesTwigs.push_back(index + 4);
 
 		// normals
-		a = _vertsTwigs[index] - _vertsTwigs[index + 2];
-		b = _vertsTwigs[index + 1] - _vertsTwigs[index + 2];
+		//a = _vertsTwigs[index] - _vertsTwigs[index + 2];
+		//b = _vertsTwigs[index + 1] - _vertsTwigs[index + 2];
 		normal = normalize(cross(a, b));
 
 		for (int i = 0; i < 4; ++i)
@@ -180,8 +180,8 @@ void Tree::createTwigs(Branch* branch)
 			_normalsTwigs.push_back(normal);
 		}
 
-		a = _vertsTwigs[index + 6] - _vertsTwigs[index + 5];
-		b = _vertsTwigs[index + 7] - _vertsTwigs[index + 5];
+		//a = _vertsTwigs[index + 6] - _vertsTwigs[index + 5];
+		//b = _vertsTwigs[index + 7] - _vertsTwigs[index + 5];
 		normal = normalize(cross(a, b));
 
 		for (int i = 0; i < 4; ++i)

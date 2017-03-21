@@ -2,6 +2,8 @@
 #include "Angel.h"
 #include <vector>
 
+using namespace std;
+
 class Branch
 {
 
@@ -22,4 +24,3 @@ public:
 
 	vector<int> root;
 };
-
