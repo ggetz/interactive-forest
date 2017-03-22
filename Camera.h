@@ -1,7 +1,3 @@
-// Shreya Patel
-// cs432
-// hw6
-
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 #include "Angel.h"

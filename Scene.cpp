@@ -228,14 +228,12 @@ void keyBoardSpecial (int key, int xx, int yy)
             
         case GLUT_KEY_UP :
             // forward
-            //cam.moveCamera(-1);
-            cout << "MOVED IN" << endl;
+            cameras[0].moveCamera(-1);
             break;
             
         case GLUT_KEY_DOWN :
             // backward
-            //cam.moveCamera(1);
-            cout << "MOVED OUT" << endl;
+            cameras[0].moveCamera(1);
             break;
     }
 }

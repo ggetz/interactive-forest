@@ -84,7 +84,7 @@ void Camera::moveCamera(int change)
 {
     vec4 e1 = eye;
     vec4 newEye;
-    newEye = vec4(e1.x + change, e1.y, e1.z);
+    newEye = vec4(e1.x, e1.y+ change, e1.z , 1);
     eye = newEye;
-    setMVMatrix();
+    viewMatrix = LookAt(eye, eye - n, v);
 }
