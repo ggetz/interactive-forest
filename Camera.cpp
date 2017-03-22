@@ -1,108 +1,100 @@
 #include "Camera.h"
 #include "mat.h"
 
-GLfloat fov = 65;
-GLfloat nearp = 1.0;
-GLfloat farp = 100.0;
 
-Camera::Camera() {
-    eye = vec4(0, 2, 0, 1);
-    n = vec4(0, 0, 1, 0);
-    v = vec4(0, 1, 0, 0);
-    u = vec4(1, 0, 0, 0);
-    setMVMatrix();
+Camera::Camera() 
+{
+    _eye = vec4(0, 2, 0, 1);
+    _n = vec4(0, 0, 1, 0);
+    _v = vec4(0, 1, 0, 0);
+    _u = vec4(1, 0, 0, 0);
+	_fov = 65;
+	_near = 1.0;
+	_far = 100.0;
+	_width = _height = 1.0;
 }
 
 vec4 Camera::getPickingLocation(vec2 pFront)
 {
     // convert pFront to pCam
-    float t = nearp * tan(fov / 2);
+    float t = _near * tan(_fov / 2);
     float r = t * (512/512);
     
-    vec4 pCam = vec4(r*pFront[0], t*pFront[1], -nearp, 1);
+    vec4 pCam = vec4(r*pFront[0], t*pFront[1], -_near, 1);
     
     // convert from pCam to pWorld
-    mat4 inverseView = mat4(vec4(u.x, v.x, n.x, eye.x),
-                            vec4(u.y, v.y, n.y, eye.y),
-                            vec4(u.z, v.z, n.z, eye.z),
+    mat4 inverseView = mat4(vec4(_u.x, _v.x, _n.x, _eye.x),
+                            vec4(_u.y, _v.y, _n.y, _eye.y),
+                            vec4(_u.z, _v.z, _n.z, _eye.z),
                             vec4(0,0,0,1));
     vec4 pWorld = inverseView * pCam;
     
     return pWorld;
 }
 
-void Camera::positionCamera(vec4 ei, vec4 ni, vec4 vi, vec4 ui) {
-    eye = ei;
-    n = ni;
-    u = ui;
-    v = vi;
-    //setMVMatrix();
-    viewMatrix = LookAt(eye, eye - n, v);
-}
-
-void Camera::setMVMatrix()
+void Camera::positionCamera(vec4 eye, vec4 n, vec4 v, vec4 u) 
 {
-    vec4 t = vec4(0.0, 0.0, 0.0, 1.0);
-    mat4 m = mat4(u,v,n,t) * Translate(-eye);
-
-    viewMatrix = m;
+	_eye = eye;
+	_n = n;
+	_v = v;
+	_u = u;
 }
-
 
 // aspect ratio
 void Camera::changeAspect(int width, int height) 
 {
-    projectionMatrix = Perspective(fov, GLfloat(width) / height, nearp, farp);
+	_width = width;
+	_height = height;
 }
 
 // camera transformations
-void Camera::yaw(int deg)
+void Camera::yaw(float deg)
 {
-    float radians = M_PI/180 * deg; // convert to radians
-    float c = cosf(radians);
-    float s = sinf(radians);
-    
-    vec4 u1 = u;
-    vec4 n1 = n;
-    
-    u = vec4(c*u1.x - s*n1.x, c*u1.y - s*n1.y, c*u1.z - s*n1.z, 0.0);
-    n = vec4(s*u1.x + c*n1.x, s*u1.y + c*n1.y, s*u1.z + c*n1.z, 0.0);
-    setMVMatrix();
+    float radians = M_PI / 180 * deg; // convert to radians
+	_n = cos(radians) * _n - sin(radians) * _u;
+	_u = sin(radians) * _n + cos(radians) * _u;
 }
 
-void Camera::pitch(int deg)
+void Camera::pitch(float deg)
 {
-    float radians = M_PI/180 * deg; // convert to radians
-    float c = cosf(radians);
-    float s = sinf(radians);
-    
-    vec4 v1 = v;
-    vec4 n1 = n;
-    
-    v = vec4(c*v1.x - s*n1.x, c*v1.y - s*n1.y, c*v1.z - s*n1.z, 0.0);
-    n = vec4(s*v1.x + c*n1.x, s*v1.y + c*n1.y, s*v1.z + c*n1.z, 0.0);
-    setMVMatrix();
+    float radians = M_PI / 180 * deg; // convert to radians
+	_v = cos(radians) * _v - sin(radians) * _n;
+	_n = sin(radians) * _v + cos(radians) * _n;
 }
 
-void Camera::roll(int deg)
+void Camera::roll (float deg)
 {
-    float radians = M_PI/180 * deg; // convert to radians
-    float c = cosf(radians);
-    float s = sinf(radians);
-    
-    vec4 u1 = u;
-    vec4 v1 = v;
-    
-    u = vec4(c*u1.x + s*v1.x, c*u1.y + s*v1.y, c*u1.z + s*v1.z, 0.0);
-    v = vec4(-s*u1.x + c*v1.x, -s*u1.y + c*v1.y, -s*u1.z + c*v1.z, 0.0);
-    setMVMatrix();
+    float radians = M_PI / 180 * deg; // convert to radians
+	_u = cos(radians) * _u - sin(radians) * _v;
+	_v = sin(radians) * _u + cos(radians) * _v;
 }
 
-void Camera::moveCamera(int change)
+void Camera::moveForward (float change)
 {
-    vec4 e1 = eye;
-    vec4 newEye;
-    newEye = vec4(e1.x, e1.y+ change, e1.z , 1);
-    eye = newEye;
-    viewMatrix = LookAt(eye, eye - n, v);
+	_eye -= _n * change;
+}
+
+void Camera::moveRight (float change)
+{
+	_eye += _u * change;
+}
+
+void Camera::moveUp (float change)
+{
+	_eye += _v * change;
+}
+
+mat4 Camera::getViewMatrix()
+{
+	return LookAt(_eye, _eye - _n, _v);
+}
+
+mat4 Camera::getProjMatrix()
+{
+	if (_perspective)
+	{
+		return Perspective(_fov, _width /_height, _near, _far);
+	}
+
+	return Ortho(-1.0, 1.0, -1.0, 1.0, 1.0, 3.0);
 }

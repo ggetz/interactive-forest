@@ -39,6 +39,9 @@ int WIDTH = 512;
 // flags and variables
 int theta;
 
+float cameraMoveSpeed = 0.2;
+float cameraRotateSpeed = 3;
+
 //----------------------------------------------------------------------------
 int main( int argc, char **argv )
 {
@@ -194,33 +197,35 @@ void keyboard( unsigned char key, int x, int y )
 
     if (key == 'X')
     {
-        // pitch down
-        cameras[0].pitch(-10);
+        cameras[0].pitch(-cameraRotateSpeed);
     }
     else if (key == 'x')
     {
-        // pitch up
-        cameras[0].pitch(10);
+        cameras[0].pitch(cameraRotateSpeed);
     }
-    else if (key == 'C')
+	else if (key == 'w')
+	{
+		cameras[0].moveForward(cameraMoveSpeed);
+	}
+	else if (key == 's')
+	{
+		cameras[0].moveForward(-cameraMoveSpeed);
+	}
+    else if (key == 'a')
     {
-        // yaw clockwise in un plane
-        cameras[0].yaw(10);
+        cameras[0].yaw(-cameraRotateSpeed);
     }
-    else if (key == 'c')
+    else if (key == 'd')
     {
-        // yaw counter-clockwise in un plane
-        cameras[0].yaw(-10);
+        cameras[0].yaw(cameraRotateSpeed);
     }
     else if (key == 'Z')
     {
-        // roll clockwise in the uv plane
-        cameras[0].roll(10);
+        cameras[0].roll(-cameraRotateSpeed);
     }
     else if (key == 'z')
     {
-        // roll counter-clockwise in the uv plane
-        cameras[0].roll(-10);
+        cameras[0].roll(cameraRotateSpeed);
     }
 
     
@@ -235,14 +240,20 @@ void keyBoardSpecial (int key, int xx, int yy)
     switch (key) {
             
         case GLUT_KEY_UP :
-            // forward
-            cameras[0].moveCamera(-1);
+            cameras[0].moveUp(cameraMoveSpeed / 2);
             break;
             
         case GLUT_KEY_DOWN :
-            // backward
-            cameras[0].moveCamera(1);
+            cameras[0].moveUp(-cameraMoveSpeed / 2);
             break;
+
+		case GLUT_KEY_RIGHT:
+			cameras[0].moveRight(cameraMoveSpeed);
+			break;
+
+		case GLUT_KEY_LEFT:
+			cameras[0].moveRight(-cameraMoveSpeed);
+			break;
     }
 }
 
