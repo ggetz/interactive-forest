@@ -4,18 +4,15 @@
 
 Mesh::Mesh()
 {
-	Mesh(vec4(0, 0, 0, 1),
-		vector<vec4>(),
+	Mesh(vector<vec4>(),
 		vector<unsigned int>(),
 		vector<vec3>(),
 		vector<vec2>());
 }
 
 
-Mesh::Mesh(vec4 origin, vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs)
+Mesh::Mesh(vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs)
 {
-	_origin = origin;
-
 	_verts = verts;
 	_faces = faces;
 	_normals = normals;
