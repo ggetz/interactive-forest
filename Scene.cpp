@@ -4,6 +4,7 @@
 #include "Ground.h"
 #include "Cube.h"
 #include "Tree.h"
+#include "Skybox.h"
 
 #include <stdlib.h> 
 
@@ -30,6 +31,11 @@ float sunAngle = 0.0;
 float sunSpeed = 0.01;
 float sunDist = 15;
 
+vec4 dayFogColor = vec4(0.6, 0.62, 0.65, 1.0);
+vec4 nightFogColor = vec4(0.25, 0.3, 0.4, 1.0);
+
+Skybox* skybox;
+
 vector<Camera> cameras;
 Mesh *ground;
 vector<Mesh*> meshes;
@@ -42,10 +48,7 @@ GLuint _shadowMapSize = 1024;
 int HEIGHT = 512;
 int WIDTH = 512;
 
-
-// flags and variables
-int theta;
-
+bool activeCamera = false;
 float cameraMoveSpeed = 0.2;
 float cameraRotateSpeed = 3;
 
@@ -90,21 +93,29 @@ void init()
 {
     cameras.push_back(Camera());
     cameras.push_back(Camera());
+
+	cameras[0].setEye(vec4(0, 2, 5, 1));
+	cameras[1].setEye(vec4(0, 15, 0, 1));
+
+	cameras[1].pitch(50);
     
     sun = DirectionalLight();
-    sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
+    sun.shadow = vec4(0.35, 0.4, 0.65, 1.0);
+	sun.fogColor = nightFogColor;
+
+	skybox = new Skybox();
     
     Material m = Material();
     m.texturePath = "textures/grass.ppm";
 	m.textureSize = 256;
-    m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
-    m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
+    m.ambient = vec4(0.4, 0.4, 0.45, 1.0);
+    m.diffuse = vec4(0.9, 0.9, 0.9, 1.0);
 
 	// set up tree material
 	treeMaterial = Material();
 	treeMaterial.texturePath = "textures/tree_bark_1.ppm";
-	treeMaterial.ambient = vec4(0.5, 0.5, 0.5, 1.0);
-	treeMaterial.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
+	treeMaterial.ambient = vec4(0.4, 0.4, 0.45, 1.0);
+	treeMaterial.diffuse = vec4(0.9, 0.9, 0.9, 1.0);
     
     ground = new Ground();
     ground->setMaterial(m);
@@ -116,6 +127,7 @@ void init()
 	meshes.push_back(treeMesh);
     
     // initialize all meshes
+	skybox->init();
     for (auto &mesh : meshes)
     {
         mesh->init();
@@ -144,12 +156,18 @@ void draw( void )
     // Render pass
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    ground->draw(cameras[0], sun, _shadowMap);
+	Camera camera = (activeCamera) ? cameras[0] : cameras[1];
+
+	vec4 skyboxEye = vec4(0, 0, 0, 1);
+	mat4 model_view = LookAt(skyboxEye, skyboxEye - camera.getN(), camera.getV());
+	skybox->draw(model_view, cameras[0].getProjMatrix());
+
+    ground->draw(camera, sun, _shadowMap);
     
     // draw all meshes
     for (auto &mesh : meshes)
     {
-        mesh->draw(cameras[0], sun, _shadowMap);
+        mesh->draw(camera, sun, _shadowMap);
     }
 		
 	glFlush();
@@ -207,6 +225,11 @@ void generateShadowMap()
 //----------------------------------------------------------------------------
 void keyboard( unsigned char key, int x, int y )
 {
+
+	if (key == 32)
+	{
+		activeCamera = !activeCamera;
+	}
 
     if (key == 'X')
     {
@@ -330,7 +353,15 @@ void update(int value)
 	sun.position = sun.direction * sunDist;
 	sun.position.w = 1.0;
 
+	// interpolate fog color depending on time of day
+	float a = (sin(sunAngle) + 1) / 2;
+	sun.fogColor = a * dayFogColor + (1 - a) * nightFogColor;
     
+	if (sunAngle >= 2 * M_PI)
+	{
+		sunAngle = 0;
+	}
+
     glutPostRedisplay();
     glutTimerFunc(50, update, value);
 }

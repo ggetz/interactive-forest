@@ -18,7 +18,9 @@ public:
 	void moveUp(float);
     void positionCamera(vec4, vec4, vec4, vec4);
     void changeAspect(int width, int height);
-	vec4 getEye() const { return _eye; }
+	vec4 getEye() { return _eye; }
+	vec4 getN() { return _n; }
+	vec4 getV() { return _v; }
 	void setEye(vec4 value) { _eye = value; }
 	mat4 getViewMatrix();
 	mat4 getProjMatrix();

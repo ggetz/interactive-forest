@@ -9,7 +9,7 @@ Camera::Camera()
     _v = vec4(0, 1, 0, 0);
     _u = vec4(1, 0, 0, 0);
 	_fov = 65;
-	_near = 1.0;
+	_near = 0.1;
 	_far = 100.0;
 	_width = _height = 1.0;
 }
@@ -93,7 +93,7 @@ mat4 Camera::getProjMatrix()
 {
 	if (_perspective)
 	{
-		return Perspective(_fov, _width /_height, _near, _far);
+		return Perspective(_fov, 1.0, _near, _far);
 	}
 
 	return Ortho(-1.0, 1.0, -1.0, 1.0, 1.0, 3.0);
