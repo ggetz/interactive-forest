@@ -14,7 +14,10 @@ class Tree
 public:
 	Tree();
 	Tree(TreeProperties properties);
-	~Tree();
+	~Tree()
+	{
+		delete _root;
+	}
 
 	Mesh* createTreeMesh()
 	{

@@ -28,6 +28,11 @@ Mesh::Mesh(vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals,
 
 Mesh::~Mesh()
 {
+	_verts.clear();
+	_faces.clear();
+	_normals.clear();
+	_uvs.clear();
+
 	glDeleteBuffers(2, _buffers);
 	glDeleteVertexArrays(1, &_vao);
 }

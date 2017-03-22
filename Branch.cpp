@@ -39,12 +39,6 @@ Branch::Branch(vec3 h, Branch* p)
 	trunk = false;
 }
 
-
-Branch::~Branch()
-{
-}
-
-
 vec3 Branch::mirrorBranch(vec3 vec, vec3 norm, TreeProperties properties)
 {
 	vec3 v = cross(norm, cross(vec, norm));
