@@ -8,20 +8,20 @@ Ground::Ground() : Mesh()
 
 void Ground::build()
 {
-    _verts.push_back(vec4(0, -20, 2, 1));
-    _verts.push_back(vec4(20, -20, 2, 1));
-    _verts.push_back(vec4(20, 0, 2, 1));
-    _verts.push_back(vec4(0, 0, 2, 1));
+    _verts.push_back(vec4(0, 0, -20, 1));
+    _verts.push_back(vec4(20, 0, -20, 1));
+    _verts.push_back(vec4(20, 0, 0, 1));
+    _verts.push_back(vec4(0, 0, 0, 1));
     
-    _verts.push_back(vec4(0, -40, 2, 1));
-    _verts.push_back(vec4(20, -40, 2, 1));
-    _verts.push_back(vec4(-20, -40, 2, 1));
-    _verts.push_back(vec4(-20, -20, 2, 1));
+    _verts.push_back(vec4(0, 0, -40, 1));
+    _verts.push_back(vec4(20, 0, -40, 1));
+    _verts.push_back(vec4(-20, 0, -40, 1));
+    _verts.push_back(vec4(-20, 0, -20, 1));
     
-    _verts.push_back(vec4(-20, 0, 2, 1));
-    _verts.push_back(vec4(-20, 20, 2, 1));
-    _verts.push_back(vec4(0, 20, 2, 1));
-    _verts.push_back(vec4(20, 20, 2, 1));
+    _verts.push_back(vec4(-20, 0, 0, 1));
+    _verts.push_back(vec4(-20, 0, 20, 1));
+    _verts.push_back(vec4(0, 0, 20, 1));
+    _verts.push_back(vec4(20, 0, 20, 1));
     
     createFace(6, 4, 0, 7);
     createFace(7, 0, 3, 8);

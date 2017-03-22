@@ -47,5 +47,5 @@ void main()
 
   shadowCoord = shadow_matrix * vPosition;
 
-  fogAmount = fogFactorLinear(length(gl_Position - eye), fog_start, fog_end);
+  fogAmount = fogFactorLinear(length(pos - eye), fog_start, fog_end);
 }

@@ -3,6 +3,7 @@
 #include "material.h"
 #include "Camera.h"
 #include "DirectionalLight.h"
+
 #include <vector>
 #include <iostream>
 
@@ -29,6 +30,13 @@ public:
 		_modelmatrix[0][3] = position.x;
 		_modelmatrix[1][3] = position.y;
 		_modelmatrix[2][3] = position.z;
+	}
+	void setYRotation(float amount)
+	{
+		_modelmatrix[0][0] =  cos(amount);
+		_modelmatrix[2][0] = -sin(amount);
+		_modelmatrix[0][2] =  sin(amount);
+		_modelmatrix[2][2] =  cos(amount);
 	}
 
 	static unsigned char* ppmRead(char* filename, int* width, int* height);

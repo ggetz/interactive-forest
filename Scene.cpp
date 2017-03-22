@@ -3,6 +3,9 @@
 #include "Camera.h"
 #include "Ground.h"
 #include "Cube.h"
+#include "Tree.h"
+
+#include <stdlib.h> 
 
 //----------------------------------------------------------------------------
 //foward declarations of functions
@@ -41,6 +44,9 @@ int theta;
 
 float cameraMoveSpeed = 0.2;
 float cameraRotateSpeed = 3;
+
+int treeSeed = 5;
+Material treeMaterial;
 
 //----------------------------------------------------------------------------
 int main( int argc, char **argv )
@@ -84,23 +90,25 @@ void init()
     sun = DirectionalLight();
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
-	//set up the camera
-	cameras[0].positionCamera(vec4(0, 0, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
-    
     Material m = Material();
     m.texturePath = "textures/grass.ppm";
     m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
     m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
+
+	// set up tree material
+	treeMaterial = Material();
+	treeMaterial.texturePath = "textures/crate_texture.ppm";
+	treeMaterial.ambient = vec4(0.5, 0.5, 0.5, 1.0);
+	treeMaterial.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
     
     ground = new Ground();
     ground->setMaterial(m);
     ground->init();
-    
-    m.texturePath = "textures/crate_texture.ppm";
-    Mesh *cube = new Cube();
-    cube->setMaterial(m);
-    cube->setPosition(vec4(-1, -2, 1, 1));
-    meshes.push_back(cube);
+
+	Tree* tree = new Tree();
+	Mesh* treeMesh = tree->createTreeMesh();
+	treeMesh->setMaterial(treeMaterial);
+	meshes.push_back(treeMesh);
     
     // initialize all meshes
     for (auto &mesh : meshes)
@@ -266,24 +274,44 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
     
     if (button == GLUT_LEFT_BUTTON)
     {
-        //cube->setPosition(vec4(xCam, yCam, 1, 1));
-        //cube->setPosition(vec4(1, -2, 1, 1));
         vec4 worldLoc = cameras[0].getPickingLocation(vec2(xCam, yCam));
-        vec4 onGround = vec4(worldLoc.x, worldLoc.y, 1, 1);
+        vec4 onGround = vec4(worldLoc.x, 0, worldLoc.z, 1);
         
-        Material m = Material();
-        m.texturePath = "crate_texture.ppm";
-        m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
-        m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
-        
-        Mesh *cube = new Cube();
-        cube->setMaterial(m);
-        cube->setPosition(onGround);
-        cube->init();
-        meshes.push_back(cube);
+		createTree(onGround);
     }
     
     glutPostRedisplay();
+}
+
+float randFloat(float low, float high)
+{
+	return low + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (high - low)));
+}
+
+void createTree (vec4 location)
+{
+	srand(treeSeed);
+
+	TreeProperties options = TreeProperties();
+	options.setSeed(treeSeed);
+	options.trunkLength = randFloat(1.0, 4.0);
+	options.initialBranchLength = randFloat(0.3, 0.9);
+	options.branchFactor = randFloat(2.1, 2.8);
+	options.taperRate = randFloat(0.89, 0.99);
+	options.sweepAmount = randFloat(-0.03, 0.03);
+	options.maxRadius = randFloat(0.03, 0.2);
+	options.trunkKink = randFloat(0, 0.1);
+
+	Tree* tree = new Tree(options);
+
+	Mesh* mesh = tree->createTreeMesh();
+	mesh->setMaterial(treeMaterial);
+	mesh->setYRotation(randFloat(0, 2 * M_PI));
+	mesh->setPosition(location);
+	mesh->init();
+
+	meshes.push_back(mesh);
+	treeSeed++;
 }
 
 //----------------------------------------------------------------------------

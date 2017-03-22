@@ -12,7 +12,16 @@ public:
 	Branch();
 	Branch(vec3 head);
 	Branch(vec3 head, Branch* parent);
-	~Branch();
+	~Branch()
+	{
+		delete child1;
+		delete child2;
+
+		root.clear();
+		ring0.clear();
+		ring1.clear();
+		ring2.clear();
+	}
 
 	Branch* child1;
 	Branch* child2;
