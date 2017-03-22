@@ -4,10 +4,10 @@ in vec4 vPosition;
 in vec3 vNormal;
 in vec2 vUV;
 
-out vec4 vColor;
+out vec4 vColor, shadowCoord;
 out vec2 texCoord;
 
-uniform mat4 model_matrix, view_matrix, proj_matrix;
+uniform mat4 model_matrix, view_matrix, proj_matrix, shadow_matrix;
 
 uniform vec4 eye;
 
@@ -36,4 +36,6 @@ void main()
   vColor.a = 1.0;
 
   gl_Position = proj_matrix * view_matrix * pos;
+
+  shadowCoord = shadow_matrix * vPosition;
 }

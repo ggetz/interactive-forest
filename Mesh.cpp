@@ -22,12 +22,7 @@ Mesh::Mesh(vec4 origin, vector<vec4> verts, vector<unsigned int> faces, vector<v
 	_uvs = uvs;
 
 	// set up model matrix, position at object origin
-	_modelmatrix = mat4(
-		1.0, 0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0, 0.0,
-		0.0, 0.0, 1.0, 0.0,
-		origin.x, origin.y, origin.z, 1.0
-		);
+	_modelmatrix = mat4();
 
 	// create a default material for the object
 	_material = Material();
@@ -44,6 +39,7 @@ Mesh::~Mesh()
 void Mesh::init()
 {
 	_program = InitShader("vshader01_v150.glsl", "fshader01_v150.glsl");
+	_shadowProgram = InitShader("vshader02_v150.glsl", "fshader02_v150.glsl");
 
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
@@ -89,10 +85,16 @@ void Mesh::init()
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Shadow buffer
+	glUseProgram(_shadowProgram);
+	GLuint shvPosition = glGetAttribLocation(_shadowProgram, "vPosition");
+	glEnableVertexAttribArray(shvPosition);
+	glVertexAttribPointer(shvPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 }
 
 
-void Mesh::draw(Camera camera, DirectionalLight light)
+void Mesh::draw(Camera camera, DirectionalLight light, GLuint shadowMap)
 {
 	glBindVertexArray(_vao);
 	glUseProgram(_program);
@@ -139,10 +141,41 @@ void Mesh::draw(Camera camera, DirectionalLight light)
 		glGetUniformLocation(_program, "proj_matrix"),
 		1, GL_TRUE, camera.getProjMatrix());
 
+	// texture properties
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _texture);
 	glUniform1i(glGetUniformLocation(_program, "textureID"), 0);
+
+	// shadow properties
+	mat4 light_camera_matrix = LookAt(light.position, light.position - light.direction, vec4(0, 1, 0, 0));
+	mat4 light_proj_matrix = Ortho(-10, 10, -10, 10, 0, 20);
+	glUniformMatrix4fv(
+		glGetUniformLocation(_program, "shadow_matrix"),
+		1, GL_TRUE, (light_proj_matrix * light_camera_matrix * _modelmatrix));
+	glUniform4fv(
+		glGetUniformLocation(_program, "shadow_color"), 1,
+		light.shadow);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shadowMap);
+	glUniform1i(glGetUniformLocation(_program, "shadow_map"), 1);
+
+	// draw
+	glEnable(GL_DEPTH_TEST);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffers[1]);
+	glDrawElements(GL_TRIANGLES, _faces.size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+}
+
+void Mesh::drawShadowMap(DirectionalLight light)
+{
+	glBindVertexArray(_vao);
+	glUseProgram(_shadowProgram);
+
+	mat4 light_camera_matrix = LookAt(light.position, light.position - light.direction, vec4(0, 1, 0, 0));
+	mat4 light_proj_matrix = Ortho(-10, 10, -10, 10, 0, 20);
+	glUniformMatrix4fv(
+		glGetUniformLocation(_shadowProgram, "MVP_matrix"),
+		1, GL_TRUE, light_proj_matrix * light_camera_matrix * _modelmatrix);
 
 	glEnable(GL_DEPTH_TEST);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffers[1]);

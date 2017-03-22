@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "DirectionalLight.h"
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -16,12 +17,20 @@ public:
 	~Mesh();
 
 	void init();
-	void draw(Camera camera, DirectionalLight light);
+	void draw(Camera camera, DirectionalLight light, GLuint shadowMap);
+	void drawShadowMap(DirectionalLight light);
 	void setMaterial(Material material) { _material = material; }
 	void setVerts(vector<vec4> verts) { _verts = verts; }
 	void setNormals(vector<vec3> normals) { _normals = normals; }
 	void setUVs(vector<vec2> uvs) { _uvs = uvs; }
 	void setFaces(vector<unsigned int> faces) { _faces = faces; }
+	void setPosition(vec4 position) 
+	{
+		_origin = position;
+		_modelmatrix[0][3] = position.x;
+		_modelmatrix[1][3] = position.y;
+		_modelmatrix[2][3] = position.z;
+	}
 
 	static unsigned char* ppmRead(char* filename, int* width, int* height);
 
@@ -32,6 +41,7 @@ protected:
 	vector<vec3> _normals;
 	vector<vec2> _uvs;
 	GLuint _program;
+	GLuint _shadowProgram;
 	GLuint _vao;
 	GLuint _buffers[2];
 	GLuint _texture;
