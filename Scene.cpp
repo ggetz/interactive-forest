@@ -82,20 +82,18 @@ void init()
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
 	//set up the camera
-    //vec4(4, 2, 1, 0)
 	cameras[0].positionCamera(vec4(0, 0, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
     
     Material m = Material();
-    m.texturePath = "grass256by256.ppm";
+    m.texturePath = "textures/grass.ppm";
     m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
     m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
     
     ground = new Ground();
     ground->setMaterial(m);
-    //ground->setPosition(vec4(0, 0.5, -7, 1));
     ground->init();
     
-    m.texturePath = "crate_texture.ppm";
+    m.texturePath = "textures/crate_texture.ppm";
     Mesh *cube = new Cube();
     cube->setMaterial(m);
     cube->setPosition(vec4(-1, -2, 1, 1));
@@ -138,7 +136,6 @@ void draw( void )
         mesh->draw(cameras[0], sun, _shadowMap);
     }
 		
-    //glutSwapBuffers();
 	glFlush();
 }
 
@@ -158,10 +155,11 @@ void initShadowMapping()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 }
 
-void resize(int w, int h){
-	glViewport(0,0,(GLsizei) w, (GLsizei) h);
-    cameras[0].changeProjection(w, h);
-	
+// When window is resized
+void resize (int w, int h)
+{
+	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+    cameras[0].changeAspect(w, h);
 }
 
 void generateShadowMap()
@@ -179,7 +177,10 @@ void generateShadowMap()
     // draw all mesh shadow maps
     for (auto &mesh : meshes)
     {
-        mesh->drawShadowMap(sun);
+		if (mesh != ground) // don't have the ground cast shadows
+		{
+			mesh->drawShadowMap(sun);
+		}
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -223,7 +224,7 @@ void keyboard( unsigned char key, int x, int y )
     }
 
     
-    if (key == 033 or key == 'q' or key == 'Q')
+    if (key == 033 || key == 'q' || key == 'Q')
     {
         exit( EXIT_SUCCESS );
     }
@@ -269,12 +270,6 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
         cube->setPosition(onGround);
         cube->init();
         meshes.push_back(cube);
-        
-    }
-    else if (button == GLUT_RIGHT_BUTTON)
-    {
-//        Triangle* tri1 = new Triangle(xCam, yCam);
-//        objs.push_back(tri1);
     }
     
     glutPostRedisplay();

@@ -15,7 +15,7 @@ public:
     void roll(int);
     void moveCamera(int);
     void positionCamera(vec4, vec4, vec4, vec4);
-    void changeProjection(int width, int height);
+    void changeAspect(int width, int height);
     mat4 getViewMatrix() const { return viewMatrix;}
     vec4 getEye() const { return eye; }
     mat4 getProjMatrix() const { return projectionMatrix; }

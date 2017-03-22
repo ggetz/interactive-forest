@@ -1,6 +1,6 @@
 #include "Camera.h"
+#include "mat.h"
 
-float PI = 3.14159265;
 GLfloat fov = 65;
 GLfloat nearp = 1.0;
 GLfloat farp = 100.0;
@@ -49,17 +49,16 @@ void Camera::setMVMatrix()
 }
 
 
-// projection
-void Camera::changeProjection(int width, int height) {
-
-    mat4 proj = Perspective(fov, GLfloat(width) / height, nearp, farp);
-    projectionMatrix = proj;
+// aspect ratio
+void Camera::changeAspect(int width, int height) 
+{
+    projectionMatrix = Perspective(fov, GLfloat(width) / height, nearp, farp);
 }
 
 // camera transformations
 void Camera::yaw(int deg)
 {
-    float radians = PI/180 * deg; // convert to radians
+    float radians = M_PI/180 * deg; // convert to radians
     float c = cosf(radians);
     float s = sinf(radians);
     
@@ -73,7 +72,7 @@ void Camera::yaw(int deg)
 
 void Camera::pitch(int deg)
 {
-    float radians = PI/180 * deg; // convert to radians
+    float radians = M_PI/180 * deg; // convert to radians
     float c = cosf(radians);
     float s = sinf(radians);
     
@@ -87,7 +86,7 @@ void Camera::pitch(int deg)
 
 void Camera::roll(int deg)
 {
-    float radians = PI/180 * deg; // convert to radians
+    float radians = M_PI/180 * deg; // convert to radians
     float c = cosf(radians);
     float s = sinf(radians);
     
