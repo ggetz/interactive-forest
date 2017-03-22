@@ -138,6 +138,17 @@ void Mesh::draw(Camera camera, DirectionalLight light, GLuint shadowMap)
 		glGetUniformLocation(_program, "proj_matrix"),
 		1, GL_TRUE, camera.getProjMatrix());
 
+	// fog properties
+	glUniform1f(
+		glGetUniformLocation(_program, "fog_start"),
+		light.fogStart);
+	glUniform1f(
+		glGetUniformLocation(_program, "fog_end"),
+		light.fogEnd);
+	glUniform4fv(
+		glGetUniformLocation(_program, "fog_color"), 1,
+		light.fogColor);
+
 	// texture properties
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);

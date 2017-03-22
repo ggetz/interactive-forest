@@ -2,10 +2,11 @@
 
 in vec4 vColor, shadowCoord;
 in vec2 texCoord;
+in float fogAmount;
 
 uniform sampler2D textureID;
 uniform sampler2D shadow_map;
-uniform vec4 shadow_color;
+uniform vec4 shadow_color, fog_color;
 
 out vec4 fragColor;
 
@@ -38,5 +39,6 @@ void main()
 		}
 	}
 
-    fragColor = texture(textureID, texCoord) * vColor * (1 - (1 - shadow_color) * shade);
+	vec4 color = texture(textureID, texCoord) * vColor * (1 - (1 - shadow_color) * shade);
+    fragColor = mix(color, fog_color, fogAmount);
 } 
