@@ -25,7 +25,7 @@ void generateShadowMap();
 DirectionalLight sun;
 vector<Camera> cameras;
 Mesh *ground;
-Mesh *cube;
+vector<Mesh*> meshes;
 
 GLuint _depthBuffer;
 GLuint _shadowMap;
@@ -96,10 +96,16 @@ void init()
     ground->init();
     
     m.texturePath = "crate_texture.ppm";
-    cube = new Cube();
+    Mesh *cube = new Cube();
     cube->setMaterial(m);
     cube->setPosition(vec4(-1, -2, 1, 1));
-    cube->init();
+    meshes.push_back(cube);
+    
+    // initialize all meshes
+    for (auto &mesh : meshes)
+    {
+        mesh->init();
+    }
     
     initShadowMapping();
     
@@ -125,7 +131,12 @@ void draw( void )
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     ground->draw(cameras[0], sun, _shadowMap);
-    cube->draw(cameras[0], sun, _shadowMap);
+    
+    // draw all meshes
+    for (auto &mesh : meshes)
+    {
+        mesh->draw(cameras[0], sun, _shadowMap);
+    }
 		
     //glutSwapBuffers();
 	glFlush();
@@ -165,15 +176,11 @@ void generateShadowMap()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _shadowMap, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     
-//    for (auto &mesh : meshes)
-//    {
-//        if (mesh != plane) // don't have the ground plan cast shadows
-//        {
-//            mesh->drawShadowMap(sun);
-//        }
-//    }
-    
-    cube->drawShadowMap(sun);
+    // draw all mesh shadow maps
+    for (auto &mesh : meshes)
+    {
+        mesh->drawShadowMap(sun);
+    }
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0,0, WIDTH, HEIGHT);
@@ -249,7 +256,20 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
     {
         //cube->setPosition(vec4(xCam, yCam, 1, 1));
         //cube->setPosition(vec4(1, -2, 1, 1));
-        cube->setPosition(cameras[0].getPickingLocation(vec2(xCam, yCam)));
+        vec4 worldLoc = cameras[0].getPickingLocation(vec2(xCam, yCam));
+        vec4 onGround = vec4(worldLoc.x, worldLoc.y, 1, 1);
+        
+        Material m = Material();
+        m.texturePath = "crate_texture.ppm";
+        m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
+        m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
+        
+        Mesh *cube = new Cube();
+        cube->setMaterial(m);
+        cube->setPosition(onGround);
+        cube->init();
+        meshes.push_back(cube);
+        
     }
     else if (button == GLUT_RIGHT_BUTTON)
     {
@@ -285,7 +305,14 @@ void update(int value)
 //----------------------------------------------------------------------------
 
 void close(){
-    delete ground, cube;
+    
+    delete ground;
+    
+    // call all mesh destructors
+    for (auto &mesh : meshes)
+    {
+        delete mesh;
+    }
 }
 
 //----------------------------------------------------------------------------
