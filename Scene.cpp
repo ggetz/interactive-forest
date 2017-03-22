@@ -2,6 +2,7 @@
 #include "Light.h"
 #include "Camera.h"
 #include "Ground.h"
+#include "Cube.h"
 
 //----------------------------------------------------------------------------
 //foward declarations of functions
@@ -23,6 +24,7 @@ void generateShadowMap();
 DirectionalLight sun;
 vector<Camera> cameras;
 Mesh *ground;
+Mesh *cube;
 
 GLuint _depthBuffer;
 GLuint _shadowMap;
@@ -74,7 +76,7 @@ void init()
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
 	//set up the camera
-	cameras[0].positionCamera(vec4(0, 2, 0, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
+	cameras[0].positionCamera(vec4(0, 2, 0, 1), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
     
     Material m = Material();
     m.texturePath = "grass256by256.ppm";
@@ -83,8 +85,14 @@ void init()
     
     ground = new Ground();
     ground->setMaterial(m);
-    ground->setPosition(vec4(0, 0.5, -7, 1));
+    //ground->setPosition(vec4(0, 0.5, -7, 1));
     ground->init();
+    
+    m.texturePath = "crate_texture.ppm";
+    cube = new Cube();
+    cube->setMaterial(m);
+    //cube->setPosition(vec4(0, 0.5, 0, 1));
+    cube->init();
     
     initShadowMapping();
     
@@ -110,6 +118,7 @@ void draw( void )
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     ground->draw(cameras[0], sun, _shadowMap);
+    cube->draw(cameras[0], sun, _shadowMap);
 		
     //glutSwapBuffers();
 	glFlush();
@@ -248,7 +257,7 @@ void update(int value)
 //----------------------------------------------------------------------------
 
 void close(){
-    delete ground;
+    delete ground, cube;
 }
 
 //----------------------------------------------------------------------------
