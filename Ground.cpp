@@ -8,12 +8,28 @@ Ground::Ground() : Mesh()
 
 void Ground::build()
 {
-    _verts.push_back(vec4(0, -1, 0, 1));
-    _verts.push_back(vec4(1, -1, 1, 1));
-    _verts.push_back(vec4(1, 0, 0, 1));
-    _verts.push_back(vec4(0, 0, 0, 1));
+    _verts.push_back(vec4(0, -20, 2, 1));
+    _verts.push_back(vec4(20, -20, 2, 1));
+    _verts.push_back(vec4(20, 0, 2, 1));
+    _verts.push_back(vec4(0, 0, 2, 1));
     
+    _verts.push_back(vec4(0, -40, 2, 1));
+    _verts.push_back(vec4(20, -40, 2, 1));
+    _verts.push_back(vec4(-20, -40, 2, 1));
+    _verts.push_back(vec4(-20, -20, 2, 1));
+    
+    _verts.push_back(vec4(-20, 0, 2, 1));
+    _verts.push_back(vec4(-20, 20, 2, 1));
+    _verts.push_back(vec4(0, 20, 2, 1));
+    _verts.push_back(vec4(20, 20, 2, 1));
+    
+    createFace(6, 4, 0, 7);
+    createFace(7, 0, 3, 8);
+    createFace(8, 3, 10, 9);
+    createFace(3, 2, 11, 10);
     createFace(0, 1, 2, 3);
+    createFace(4, 5, 1, 0);
+    
     
     calcNormals();
 }

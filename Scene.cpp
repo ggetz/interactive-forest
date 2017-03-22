@@ -76,7 +76,7 @@ void init()
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
 	//set up the camera
-	cameras[0].positionCamera(vec4(0, 2, 0, 1), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
+	cameras[0].positionCamera(vec4(4, 2, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
     
     Material m = Material();
     m.texturePath = "grass256by256.ppm";
@@ -165,6 +165,8 @@ void generateShadowMap()
 //            mesh->drawShadowMap(sun);
 //        }
 //    }
+    
+    cube->drawShadowMap(sun);
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0,0, 512, 512);

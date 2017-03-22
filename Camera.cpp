@@ -15,7 +15,8 @@ void Camera::positionCamera(vec4 ei, vec4 ni, vec4 vi, vec4 ui) {
     n = ni;
     u = ui;
     v = vi;
-    setMVMatrix();
+    //setMVMatrix();
+    viewMatrix = LookAt(eye, eye - n, v);
 }
 
 void Camera::setMVMatrix()
