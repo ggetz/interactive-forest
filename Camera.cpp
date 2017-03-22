@@ -1,6 +1,9 @@
 #include "Camera.h"
 
 float PI = 3.14159265;
+GLfloat fov = 65;
+GLfloat nearp = 1.0;
+GLfloat farp = 100.0;
 
 Camera::Camera() {
     eye = vec4(0, 2, 0, 1);
@@ -8,6 +11,24 @@ Camera::Camera() {
     v = vec4(0, 1, 0, 0);
     u = vec4(1, 0, 0, 0);
     setMVMatrix();
+}
+
+vec4 Camera::getPickingLocation(vec2 pFront)
+{
+    // convert pFront to pCam
+    float t = nearp * tan(fov / 2);
+    float r = t * (512/512);
+    
+    vec4 pCam = vec4(r*pFront[0], t*pFront[1], -nearp, 1);
+    
+    // convert from pCam to pWorld
+    mat4 inverseView = mat4(vec4(u.x, v.x, n.x, eye.x),
+                            vec4(u.y, v.y, n.y, eye.y),
+                            vec4(u.z, v.z, n.z, eye.z),
+                            vec4(0,0,0,1));
+    vec4 pWorld = inverseView * pCam;
+    
+    return pWorld;
 }
 
 void Camera::positionCamera(vec4 ei, vec4 ni, vec4 vi, vec4 ui) {
@@ -30,9 +51,7 @@ void Camera::setMVMatrix()
 
 // projection
 void Camera::changeProjection(int width, int height) {
-    GLfloat fov = 65;
-    GLfloat nearp = 1.0;
-    GLfloat farp = 100.0;
+
     mat4 proj = Perspective(fov, GLfloat(width) / height, nearp, farp);
     projectionMatrix = proj;
 }

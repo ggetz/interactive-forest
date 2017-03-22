@@ -1,7 +1,7 @@
 #pragma once
 #include "Angel.h"
 #include "material.h"
-#include "camera.h"
+#include "Camera.h"
 #include "DirectionalLight.h"
 #include <vector>
 #include <iostream>

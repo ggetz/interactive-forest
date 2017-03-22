@@ -241,14 +241,15 @@ void keyBoardSpecial (int key, int xx, int yy)
 // mouse click callback function
 void mouseClicked(GLint button, GLint state, GLint x, GLint y)
 {
+    // pFront
     float xCam = (2 * ((float)x / ((float)WIDTH))) - 1;
     float yCam = (2 * (((float)HEIGHT) - (float)y) / ((float)HEIGHT)) - 1;
     
     if (button == GLUT_LEFT_BUTTON)
     {
-        //Square* s1 = new Square(xCam, yCam);
         //cube->setPosition(vec4(xCam, yCam, 1, 1));
-        cube->setPosition(vec4(1, -2, 1, 1));
+        //cube->setPosition(vec4(1, -2, 1, 1));
+        cube->setPosition(cameras[0].getPickingLocation(vec2(xCam, yCam)));
     }
     else if (button == GLUT_RIGHT_BUTTON)
     {

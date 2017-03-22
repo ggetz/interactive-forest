@@ -1,7 +1,9 @@
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#pragma once
 #include "Angel.h"
 #include <vector>
+
+
+using namespace std;
 
 class Camera {
 public:
@@ -18,10 +20,10 @@ public:
     vec4 getEye() const { return eye; }
     mat4 getProjMatrix() const { return projectionMatrix; }
     void setMVMatrix();
+    vec4 getPickingLocation(vec2 pFront);
 
 public:
 	vec4 eye, u, v, n;
 	mat4 viewMatrix, projectionMatrix;
 };
 
-#endif
