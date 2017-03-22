@@ -3,7 +3,7 @@
 float PI = 3.14159265;
 
 Camera::Camera() {
-    eye = vec4(0, 2, 0, 0);
+    eye = vec4(0, 2, 0, 1);
     n = vec4(0, 0, 1, 0);
     v = vec4(0, 1, 0, 0);
     u = vec4(1, 0, 0, 0);
@@ -26,15 +26,15 @@ void Camera::setMVMatrix()
     viewMatrix = m;
 }
 
-//
-//// projection
-//void Camera::changeProjection(int width, int height) {
-//    GLfloat fov = 65;
-//    GLfloat nearp = 1.0;
-//    GLfloat farp = 100.0;
-//    mat4 proj = Perspective(fov, GLfloat(width) / height, nearp, farp);
-//    setProjection(proj);
-//}
+
+// projection
+void Camera::changeProjection(int width, int height) {
+    GLfloat fov = 65;
+    GLfloat nearp = 1.0;
+    GLfloat farp = 100.0;
+    mat4 proj = Perspective(fov, GLfloat(width) / height, nearp, farp);
+    projectionMatrix = proj;
+}
 
 // camera transformations
 void Camera::yaw(int deg)

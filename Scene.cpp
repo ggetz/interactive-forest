@@ -14,13 +14,20 @@ void update(int value);
 void close();
 
 void createTree(vec4 location);
+void initShadowMapping();
+void generateShadowMap();
 
 
 //----------------------------------------------------------------------------
 // GLOBALS
-DirectionalLight *sun;
+DirectionalLight sun;
 vector<Camera> cameras;
 Mesh *ground;
+
+GLuint _depthBuffer;
+GLuint _shadowMap;
+GLuint _shadowMapSize = 1024;
+
 
 // flags and variables
 int theta;
@@ -63,12 +70,24 @@ void init()
     cameras.push_back(Camera());
     cameras.push_back(Camera());
     
+    sun = DirectionalLight();
+    sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
 	//set up the camera
-	cameras[0].positionCamera(vec4(0, 2, 0, 1), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
+	cameras[0].positionCamera(vec4(0, 2, 0, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
+    
+    Material m = Material();
+    m.texturePath = "grass256by256.ppm";
+    m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
+    m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
     
     ground = new Ground();
-    sun = new DirectionalLight();
+    ground->setMaterial(m);
+    ground->setPosition(vec4(0, 0.5, -7, 1));
+    ground->init();
+    
+    initShadowMapping();
+    
 	
 	glEnable(GL_DEPTH_TEST); //since we're doing 3D graphics, enable the Z-buffer depth test
 	
@@ -80,20 +99,68 @@ void init()
 
 void draw( void )
 {
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  //clear out the color of the framebuffer and the depth info from the depth buffer
+    // Shadow pass
+    glCullFace(GL_FRONT);
+    
+    generateShadowMap();
+    
+    glCullFace(GL_NONE);
+    
+    // Render pass
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    ground->draw(cameras[0], *sun, GL_TRUE);
+    ground->draw(cameras[0], sun, _shadowMap);
 		
-    glutSwapBuffers();
+    //glutSwapBuffers();
 	glFlush();
 }
 
 //----------------------------------------------------------------------------
 
+void initShadowMapping()
+{
+    glGenFramebuffers(1, &_depthBuffer);
+    glGenTextures(1, &_shadowMap);
+    
+    glBindTexture(GL_TEXTURE_2D, _shadowMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _shadowMapSize, _shadowMapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+    
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+}
+
 void resize(int w, int h){
 	glViewport(0,0,(GLsizei) w, (GLsizei) h);
+    cameras[0].changeProjection(w, h);
 	
 }
+
+void generateShadowMap()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, _depthBuffer);
+    glViewport(0, 0, _shadowMapSize, _shadowMapSize);
+    
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    
+    glBindTexture(GL_TEXTURE_2D, _shadowMap);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _shadowMap, 0);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+//    for (auto &mesh : meshes)
+//    {
+//        if (mesh != plane) // don't have the ground plan cast shadows
+//        {
+//            mesh->drawShadowMap(sun);
+//        }
+//    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0,0, 512, 512);
+}
+
 
 //----------------------------------------------------------------------------
 void keyboard( unsigned char key, int x, int y )
