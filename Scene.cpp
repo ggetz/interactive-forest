@@ -45,8 +45,8 @@ GLuint _shadowMap;
 GLuint _shadowMapSize = 1024;
 
 // window size
-int HEIGHT = 512;
-int WIDTH = 512;
+int HEIGHT = 800;
+int WIDTH = 800;
 
 bool activeCamera = false;
 float cameraMoveSpeed = 0.2;

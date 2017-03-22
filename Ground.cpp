@@ -12,16 +12,31 @@ void Ground::build()
     _verts.push_back(vec4(20, 0, -20, 1));
     _verts.push_back(vec4(20, 0, 0, 1));
     _verts.push_back(vec4(0, 0, 0, 1));
+
+	_uvs.push_back(vec2(0.5, 0.25));
+	_uvs.push_back(vec2(1, 0.25));
+	_uvs.push_back(vec2(1, 0.5));
+	_uvs.push_back(vec2(0.5, 0.5));
     
     _verts.push_back(vec4(0, 0, -40, 1));
     _verts.push_back(vec4(20, 0, -40, 1));
     _verts.push_back(vec4(-20, 0, -40, 1));
     _verts.push_back(vec4(-20, 0, -20, 1));
+
+	_uvs.push_back(vec2(0.5, 0));
+	_uvs.push_back(vec2(1, 0));
+	_uvs.push_back(vec2(0, 0));
+	_uvs.push_back(vec2(0, 0.25));
     
     _verts.push_back(vec4(-20, 0, 0, 1));
     _verts.push_back(vec4(-20, 0, 20, 1));
     _verts.push_back(vec4(0, 0, 20, 1));
     _verts.push_back(vec4(20, 0, 20, 1));
+
+	_uvs.push_back(vec2(0, 0.5));
+	_uvs.push_back(vec2(0, 0.75));
+	_uvs.push_back(vec2(0.5, 0.75));
+	_uvs.push_back(vec2(0, 0.75));
     
     createFace(6, 4, 0, 7);
     createFace(7, 0, 3, 8);
@@ -40,19 +55,13 @@ void Ground::createFace(int a, int b, int c, int d)
     _faces.push_back(a);
     _faces.push_back(b);
     _faces.push_back(c);
-    
-    _uvs.push_back(vec2(0, 0));
-    _uvs.push_back(vec2(1, 0));
-    _uvs.push_back(vec2(1, 1));
+   
     
     // second triangle
     _faces.push_back(c);
     _faces.push_back(d);
     _faces.push_back(a);
-    
-    _uvs.push_back(vec2(0, 0));
-    _uvs.push_back(vec2(1, 1));
-    _uvs.push_back(vec2(0, 1));
+   
 }
 
 void Ground::calcNormals()
