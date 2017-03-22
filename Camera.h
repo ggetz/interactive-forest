@@ -10,20 +10,23 @@ public:
 	Camera();
     
     // camera transformation functions
-    void yaw(int);
-    void pitch(int);
-    void roll(int);
-    void moveCamera(int);
+    void yaw(float);
+    void pitch(float);
+    void roll(float);
+    void moveForward(float);
+	void moveRight(float);
+	void moveUp(float);
     void positionCamera(vec4, vec4, vec4, vec4);
-    void changeProjection(int width, int height);
-    mat4 getViewMatrix() const { return viewMatrix;}
-    vec4 getEye() const { return eye; }
-    mat4 getProjMatrix() const { return projectionMatrix; }
-    void setMVMatrix();
+    void changeAspect(int width, int height);
+	vec4 getEye() const { return _eye; }
+	void setEye(vec4 value) { _eye = value; }
+	mat4 getViewMatrix();
+	mat4 getProjMatrix();
     vec4 getPickingLocation(vec2 pFront);
 
-public:
-	vec4 eye, u, v, n;
-	mat4 viewMatrix, projectionMatrix;
+private:
+	vec4 _eye, _u, _v, _n;
+	float _fov, _near, _far, _width, _height;
+	bool _perspective;
 };
 

@@ -26,8 +26,6 @@ DirectionalLight sun;
 vector<Camera> cameras;
 Mesh *ground;
 vector<Mesh*> meshes;
-Camera currentCam;
-bool isCam1_ON;
 
 GLuint _depthBuffer;
 GLuint _shadowMap;
@@ -40,6 +38,9 @@ int WIDTH = 512;
 
 // flags and variables
 int theta;
+
+float cameraMoveSpeed = 0.2;
+float cameraRotateSpeed = 3;
 
 //----------------------------------------------------------------------------
 int main( int argc, char **argv )
@@ -83,24 +84,19 @@ void init()
     sun = DirectionalLight();
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
-	//set up the cameras
-    //vec4(4, 2, 1, 0)
+	//set up the camera
 	cameras[0].positionCamera(vec4(0, 0, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
-    cameras[1].positionCamera(vec4(1, 0, 0, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
-    isCam1_ON = true;
-    currentCam = cameras[0];
     
     Material m = Material();
-    m.texturePath = "grass256by256.ppm";
+    m.texturePath = "textures/grass.ppm";
     m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
     m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
     
     ground = new Ground();
     ground->setMaterial(m);
-    //ground->setPosition(vec4(0, 0.5, -7, 1));
     ground->init();
     
-    m.texturePath = "crate_texture.ppm";
+    m.texturePath = "textures/crate_texture.ppm";
     Mesh *cube = new Cube();
     cube->setMaterial(m);
     cube->setPosition(vec4(-1, -2, 1, 1));
@@ -135,15 +131,14 @@ void draw( void )
     // Render pass
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    ground->draw(currentCam, sun, _shadowMap);
+    ground->draw(cameras[0], sun, _shadowMap);
     
     // draw all meshes
     for (auto &mesh : meshes)
     {
-        mesh->draw(currentCam, sun, _shadowMap);
+        mesh->draw(cameras[0], sun, _shadowMap);
     }
 		
-    //glutSwapBuffers();
 	glFlush();
 }
 
@@ -163,10 +158,11 @@ void initShadowMapping()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 }
 
-void resize(int w, int h){
-	glViewport(0,0,(GLsizei) w, (GLsizei) h);
-    currentCam.changeProjection(w, h);
-	
+// When window is resized
+void resize (int w, int h)
+{
+	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+    cameras[0].changeAspect(w, h);
 }
 
 void generateShadowMap()
@@ -184,7 +180,10 @@ void generateShadowMap()
     // draw all mesh shadow maps
     for (auto &mesh : meshes)
     {
-        mesh->drawShadowMap(sun);
+		if (mesh != ground) // don't have the ground cast shadows
+		{
+			mesh->drawShadowMap(sun);
+		}
     }
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -195,66 +194,45 @@ void generateShadowMap()
 //----------------------------------------------------------------------------
 void keyboard( unsigned char key, int x, int y )
 {
-    if (key == ' ')
+
+    if (key == 'X')
     {
-        if (isCam1_ON == true)
-        {
-            // switch to camera 1
-            isCam1_ON = false;
-            cout << "cam1" << endl;
-            
-        }
-        else
-        {
-            // switch to camera 2
-            isCam1_ON = true;
-            cout << "cam2" << endl;
-        }
+        cameras[0].pitch(-cameraRotateSpeed);
     }
-    else
+    else if (key == 'x')
     {
-        if (isCam1_ON)
-        {
-            if (key == 'X')
-            {
-                // pitch down
-                cameras[0].pitch(-10);
-            }
-            else if (key == 'x')
-            {
-                // pitch up
-                cameras[0].pitch(10);
-            }
-            else if (key == 'C')
-            {
-                // yaw clockwise in un plane
-                cameras[0].yaw(10);
-            }
-            else if (key == 'c')
-            {
-                // yaw counter-clockwise in un plane
-                cameras[0].yaw(-10);
-            }
-            else if (key == 'Z')
-            {
-                // roll clockwise in the uv plane
-                cameras[0].roll(10);
-            }
-            else if (key == 'z')
-            {
-                // roll counter-clockwise in the uv plane
-                cameras[0].roll(-10);
-            }
-        }
+        cameras[0].pitch(cameraRotateSpeed);
+    }
+	else if (key == 'w')
+	{
+		cameras[0].moveForward(cameraMoveSpeed);
+	}
+	else if (key == 's')
+	{
+		cameras[0].moveForward(-cameraMoveSpeed);
+	}
+    else if (key == 'a')
+    {
+        cameras[0].yaw(-cameraRotateSpeed);
+    }
+    else if (key == 'd')
+    {
+        cameras[0].yaw(cameraRotateSpeed);
+    }
+    else if (key == 'Z')
+    {
+        cameras[0].roll(-cameraRotateSpeed);
+    }
+    else if (key == 'z')
+    {
+        cameras[0].roll(cameraRotateSpeed);
     }
 
     
-    if (key == 033 or key == 'q' or key == 'Q')
+    if (key == 033 || key == 'q' || key == 'Q')
     {
         exit( EXIT_SUCCESS );
     }
-    
-    glutPostRedisplay();
 }
 
 void keyBoardSpecial (int key, int xx, int yy)
@@ -262,17 +240,21 @@ void keyBoardSpecial (int key, int xx, int yy)
     switch (key) {
             
         case GLUT_KEY_UP :
-            // forward
-            cameras[0].moveCamera(-1);
+            cameras[0].moveUp(cameraMoveSpeed / 2);
             break;
             
         case GLUT_KEY_DOWN :
-            // backward
-            cameras[0].moveCamera(1);
+            cameras[0].moveUp(-cameraMoveSpeed / 2);
             break;
+
+		case GLUT_KEY_RIGHT:
+			cameras[0].moveRight(cameraMoveSpeed);
+			break;
+
+		case GLUT_KEY_LEFT:
+			cameras[0].moveRight(-cameraMoveSpeed);
+			break;
     }
-    
-    glutPostRedisplay();
 }
 
 // mouse click callback function
@@ -286,7 +268,7 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
     {
         //cube->setPosition(vec4(xCam, yCam, 1, 1));
         //cube->setPosition(vec4(1, -2, 1, 1));
-        vec4 worldLoc = currentCam.getPickingLocation(vec2(xCam, yCam));
+        vec4 worldLoc = cameras[0].getPickingLocation(vec2(xCam, yCam));
         vec4 onGround = vec4(worldLoc.x, worldLoc.y, 1, 1);
         
         Material m = Material();
@@ -299,12 +281,6 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
         cube->setPosition(onGround);
         cube->init();
         meshes.push_back(cube);
-        
-    }
-    else if (button == GLUT_RIGHT_BUTTON)
-    {
-//        Triangle* tri1 = new Triangle(xCam, yCam);
-//        objs.push_back(tri1);
     }
     
     glutPostRedisplay();
@@ -314,32 +290,22 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
 // animation/timer callback function
 void update(int value)
 {
-//    // "rising and setting the sun"
-//    theta++;
-//    if (theta > 360)
-//    {
-//        theta = 0;
-//    }
-//    
-//    float rad = theta/2*3.1459;
-//    
-//    sun.direction = vec3(-5, cos(rad), -10);
+    // "rising and setting the sun"
+    theta++;
+    if (theta > 360)
+    {
+        theta = 0;
+    }
     
-    // set camera
-//    if (isCam1_ON)
-//    {
-//        // flying camera
-//        currentCam = cameras[0];
-//    }
-//    else
-//    {
-//        // overhead camera
-//        currentCam = cameras[1];
-//    }
+    float rad = theta/2*3.1459;
     
+//    lights[1].changeLightProps(vec4(theta, -theta/20, -10, 1), vec4(0.1f, 0.1f, 0.1f, 1), vec4(0.1, 0.1, 0.1, 1), vec4(0.1, 0.1, 0.1, 1));
+//    sun.changeLightProps(vec4(cos(rad), 10, sin(rad) , 1), vec4(0.1f, 0.1f, 0.1f, 1), vec4(0.1, 0.1, 0.1, 1), vec4(0.1, 0.1, 0.1, 1));
+    //sun.direction = vec3(cos(rad), sin(rad), 1);
+
     
     glutPostRedisplay();
-    glutTimerFunc(500, update, value);
+    glutTimerFunc(50, update, value);
 }
 
 //----------------------------------------------------------------------------
