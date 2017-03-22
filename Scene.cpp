@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Ground.h"
 #include "Cube.h"
+#include "Tree.h"
 
 //----------------------------------------------------------------------------
 //foward declarations of functions
@@ -84,9 +85,6 @@ void init()
     sun = DirectionalLight();
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
-	//set up the camera
-	cameras[0].positionCamera(vec4(0, 0, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
-    
     Material m = Material();
     m.texturePath = "textures/grass.ppm";
     m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
@@ -101,6 +99,11 @@ void init()
     cube->setMaterial(m);
     cube->setPosition(vec4(-1, -2, 1, 1));
     meshes.push_back(cube);
+
+	Tree* tree = new Tree();
+	Mesh* treeMesh = tree->createTreeMesh();
+	treeMesh->setMaterial(m);
+	meshes.push_back(treeMesh);
     
     // initialize all meshes
     for (auto &mesh : meshes)
@@ -266,13 +269,11 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
     
     if (button == GLUT_LEFT_BUTTON)
     {
-        //cube->setPosition(vec4(xCam, yCam, 1, 1));
-        //cube->setPosition(vec4(1, -2, 1, 1));
         vec4 worldLoc = cameras[0].getPickingLocation(vec2(xCam, yCam));
-        vec4 onGround = vec4(worldLoc.x, worldLoc.y, 1, 1);
+        vec4 onGround = vec4(worldLoc.x, 0.5, worldLoc.z, 1);
         
         Material m = Material();
-        m.texturePath = "crate_texture.ppm";
+        m.texturePath = "textures/crate_texture.ppm";
         m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
         m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
         
