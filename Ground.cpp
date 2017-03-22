@@ -6,29 +6,74 @@ Ground::Ground() : Mesh()
     build();
 }
 
+int width = 6;
+int height = 6;
+
 void Ground::build()
 {
-    _verts.push_back(vec4(0, -20, 2, 1));
-    _verts.push_back(vec4(20, -20, 2, 1));
-    _verts.push_back(vec4(20, 0, 2, 1));
-    _verts.push_back(vec4(0, 0, 2, 1));
+    for (int i=0; i < width; i += 1)
+    {
+        for (int j=0; j < height; j += 1)
+        {
+            _verts.push_back(vec4(i, 0, j, 1));
+        }
+    }
+
+    createFace(0,6,7,1);
+    createFace(1,7,8,2);
     
-    _verts.push_back(vec4(0, -40, 2, 1));
-    _verts.push_back(vec4(20, -40, 2, 1));
-    _verts.push_back(vec4(-20, -40, 2, 1));
-    _verts.push_back(vec4(-20, -20, 2, 1));
+    for (int k=0; k < _verts.size(); ++k)
+    {
+//        for (int i=0; i < width-1; ++i)
+        {
+//            if (!(k % (width * k) == 0))
+            {
+                createFace(k, k+width, k+width+1, k+1);
+                cout << k << " " << k+width << " " << k+width+1 << " " << k+1 << endl;
+            }
+            //            else
+            //            {
+            //                createFace(k, k+width, k+width+1, k+1);
+            //            }
+        }
+    }
     
-    _verts.push_back(vec4(-20, 0, 2, 1));
-    _verts.push_back(vec4(-20, 20, 2, 1));
-    _verts.push_back(vec4(0, 20, 2, 1));
-    _verts.push_back(vec4(20, 20, 2, 1));
-    
-    createFace(6, 4, 0, 7);
-    createFace(7, 0, 3, 8);
-    createFace(8, 3, 10, 9);
-    createFace(3, 2, 11, 10);
-    createFace(0, 1, 2, 3);
-    createFace(4, 5, 1, 0);
+//    _verts.push_back(vec4(0, -20, 2, 1));
+//    _verts.push_back(vec4(20, -20, 2, 1));
+//    _verts.push_back(vec4(20, 0, 2, 1));
+//    _verts.push_back(vec4(0, 0, 2, 1));
+//    
+//    _verts.push_back(vec4(0, -40, 2, 1));
+//    _verts.push_back(vec4(20, -40, 2, 1));
+//    _verts.push_back(vec4(-20, -40, 2, 1));
+//    _verts.push_back(vec4(-20, -20, 2, 1));
+//    
+//    _verts.push_back(vec4(-20, 0, 2, 1));
+//    _verts.push_back(vec4(-20, 20, 2, 1));
+//    _verts.push_back(vec4(0, 20, 2, 1));
+//    _verts.push_back(vec4(20, 20, 2, 1));
+//
+////    _verts.push_back(vec4(0, 0, -20, 1));
+////    _verts.push_back(vec4(20, 0, -20, 1));
+////    _verts.push_back(vec4(20, 0, 0, 1));
+////    _verts.push_back(vec4(0, 0, 0, 1));
+////    
+////    _verts.push_back(vec4(0, 0, -40, 1));
+////    _verts.push_back(vec4(20, 0, -40, 1));
+////    _verts.push_back(vec4(-20, 0, -40, 1));
+////    _verts.push_back(vec4(-20, 0, -20, 1));
+////    
+////    _verts.push_back(vec4(-20, 0, 0, 1));
+////    _verts.push_back(vec4(-20, 0, 20, 1));
+////    _verts.push_back(vec4(0, 0, 20, 1));
+////    _verts.push_back(vec4(20, 0, 20, 1));
+//
+//    createFace(6, 4, 0, 7);
+//    createFace(7, 0, 3, 8);
+//    createFace(8, 3, 10, 9);
+//    createFace(3, 2, 11, 10);
+//    createFace(0, 1, 2, 3);
+//    createFace(4, 5, 1, 0);
     
     
     calcNormals();

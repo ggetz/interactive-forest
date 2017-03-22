@@ -39,7 +39,7 @@ int WIDTH = 512;
 // flags and variables
 int theta;
 
-float cameraMoveSpeed = 0.2;
+float cameraMoveSpeed = 0.8;
 float cameraRotateSpeed = 3;
 
 //----------------------------------------------------------------------------
@@ -266,13 +266,11 @@ void mouseClicked(GLint button, GLint state, GLint x, GLint y)
     
     if (button == GLUT_LEFT_BUTTON)
     {
-        //cube->setPosition(vec4(xCam, yCam, 1, 1));
-        //cube->setPosition(vec4(1, -2, 1, 1));
         vec4 worldLoc = cameras[0].getPickingLocation(vec2(xCam, yCam));
-        vec4 onGround = vec4(worldLoc.x, worldLoc.y, 1, 1);
+        vec4 onGround = vec4(worldLoc.x, 0.5, worldLoc.z, 1);
         
         Material m = Material();
-        m.texturePath = "crate_texture.ppm";
+        m.texturePath = "textures/crate_texture.ppm";
         m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
         m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
         
