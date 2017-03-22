@@ -1,4 +1,5 @@
 #pragma once
+#include <math.h>
 
 /**
 	Options object used to create a Tree object.
@@ -13,34 +14,31 @@ public:
 	TreeProperties () 
 	{
 		// default values
-		seed = 10;
+		seed = rseed = 262;
 		segments = 6;
 		levels = 5;
-		vMultiplier = 0.2;
+		vMultiplier = 2.36;
 		twigScale = 2.0;
-		initialBranchLength = 0.85;
+		initialBranchLength = 0.53;
 		lengthFalloffFactor = 0.85;
-		lengthFalloffPower = 1.0;
-		clumpMax = 0.8;
-		clumpMin = 0.5;
-		branchFactor = 2.0;
-		dropAmount = 0.0;
-		growAmount = 0.0;
-		sweepAmount = 0.0;
-		maxRadius = 0.25;
-		climbRate = 1.5;
-		trunkKink = 0.0;
-		treeSteps = 2;
+		lengthFalloffPower = 0.99;
+		clumpMax = 0.6;
+		clumpMin = 0.4;
+		branchFactor = 2.5;
+		dropAmount = -0.2;
+		growAmount = 0.03;
+		sweepAmount = 0.01;
+		maxRadius = 0.139;
+		climbRate = 0.4;
+		trunkKink = 0.093;
+		treeSteps = 5;
 		taperRate = 0.95;
 		radiusFalloffRate = 0.6;
-		twistRate = 13;
+		twistRate = 0.1;
 		trunkLength = 2.4;
 	}
 
-	// Random seed used to create a unique tree
-	int seed;
-
-	// Number of segemnts in tree
+	// Number of segemnts around tree branches
 	int segments;
 
 	// Number of branch generation levels
@@ -79,4 +77,19 @@ public:
 
 	// Length of trunk before branches begin
 	float trunkLength;
+	
+	// Random seed used to generate tree
+	void setSeed(int value)
+	{
+		seed = rseed = value;
+	}
+
+	int seed;
+	int rseed;
+
+	float random (int a) 
+	{
+		return abs(cos(a + a * a));
+	}
+
 };

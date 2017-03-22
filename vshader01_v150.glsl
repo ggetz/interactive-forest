@@ -6,6 +6,7 @@ in vec2 vUV;
 
 out vec4 vColor, shadowCoord;
 out vec2 texCoord;
+out float fogAmount;
 
 uniform mat4 model_matrix, view_matrix, proj_matrix, shadow_matrix;
 
@@ -16,6 +17,13 @@ uniform float shininess;
 
 uniform vec3 light_direction;
 uniform vec4 light_ambient, light_diffuse, light_specular;
+
+uniform float fog_start, fog_end;
+
+float fogFactorLinear(const float dist, const float start, const float end) 
+{
+  return 1.0 - clamp((end - dist) / (end - start), 0.0, 1.0);
+}
 
 void main() 
 {
@@ -38,4 +46,6 @@ void main()
   gl_Position = proj_matrix * view_matrix * pos;
 
   shadowCoord = shadow_matrix * vPosition;
+
+  fogAmount = fogFactorLinear(length(gl_Position - eye), fog_start, fog_end);
 }

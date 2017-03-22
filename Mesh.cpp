@@ -4,18 +4,15 @@
 
 Mesh::Mesh()
 {
-	Mesh(vec4(0, 0, 0, 1),
-		vector<vec4>(),
+	Mesh(vector<vec4>(),
 		vector<unsigned int>(),
 		vector<vec3>(),
 		vector<vec2>());
 }
 
 
-Mesh::Mesh(vec4 origin, vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs)
+Mesh::Mesh(vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs)
 {
-	_origin = origin;
-
 	_verts = verts;
 	_faces = faces;
 	_normals = normals;
@@ -140,6 +137,17 @@ void Mesh::draw(Camera camera, DirectionalLight light, GLuint shadowMap)
 	glUniformMatrix4fv(
 		glGetUniformLocation(_program, "proj_matrix"),
 		1, GL_TRUE, camera.getProjMatrix());
+
+	// fog properties
+	glUniform1f(
+		glGetUniformLocation(_program, "fog_start"),
+		light.fogStart);
+	glUniform1f(
+		glGetUniformLocation(_program, "fog_end"),
+		light.fogEnd);
+	glUniform4fv(
+		glGetUniformLocation(_program, "fog_color"), 1,
+		light.fogColor);
 
 	// texture properties
 	glEnable(GL_TEXTURE_2D);

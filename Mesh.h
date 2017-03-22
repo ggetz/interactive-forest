@@ -13,7 +13,7 @@ class Mesh
 
 public:
 	Mesh();
-	Mesh(vec4 origin, vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs);
+	Mesh(vector<vec4> verts, vector<unsigned int> faces, vector<vec3> normals, vector<vec2> uvs);
 	~Mesh();
 
 	void init();
@@ -26,7 +26,6 @@ public:
 	void setFaces(vector<unsigned int> faces) { _faces = faces; }
 	void setPosition(vec4 position) 
 	{
-		_origin = position;
 		_modelmatrix[0][3] = position.x;
 		_modelmatrix[1][3] = position.y;
 		_modelmatrix[2][3] = position.z;
@@ -35,7 +34,6 @@ public:
 	static unsigned char* ppmRead(char* filename, int* width, int* height);
 
 protected:
-	vec4 _origin;
 	vector<vec4> _verts;
 	vector<unsigned int> _faces;
 	vector<vec3> _normals;

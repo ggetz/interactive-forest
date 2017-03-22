@@ -14,7 +14,11 @@ selection”, and “how do you do collision detection” should be discussed. A
 things you did and/or things that aren’t working properly and why you think that may be. You should
 also provide a visualization for your scene graph(s).
 
+Tree meshes were created procedurally and the generation is based on the webgl library [supereggbert/proctree.js](https://github.com/supereggbert/proctree.js). The port of this library creates the vertex, normal, and tetxure map locations for a tree mesh based on a random seed and specified tree parameters. We then assign a material to each tree and rendered the using index arrays.
+
 Shadows were rendered in the scene using shadow mapping as explored in the slides, though using a modified projection when rendering the shadow pass using the directional light. In addition, to fight the shadow map texture aliasing, we used Poisson Sampling to take multple samples from the shadow map. Our shader also allows for a shadow color to passed in instead of just black for aestetic effect.
+
+Fog was added to the scene by adding linear fog to the mesh shader. It takes the distance from the eye of the camera to the vertex location, and interpolates between the fog color and the fragment color by this amount.
 
 ## Work Allocation
 If you chose to work with a partner, you should make clear who is responsible for what in the project.
