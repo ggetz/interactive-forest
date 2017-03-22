@@ -26,6 +26,10 @@ void generateShadowMap();
 //----------------------------------------------------------------------------
 // GLOBALS
 DirectionalLight sun;
+float sunAngle = 0.0;
+float sunSpeed = 0.01;
+float sunDist = 15;
+
 vector<Camera> cameras;
 Mesh *ground;
 vector<Mesh*> meshes;
@@ -92,12 +96,13 @@ void init()
     
     Material m = Material();
     m.texturePath = "textures/grass.ppm";
+	m.textureSize = 256;
     m.ambient = vec4(0.5, 0.5, 0.5, 1.0);
     m.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
 
 	// set up tree material
 	treeMaterial = Material();
-	treeMaterial.texturePath = "textures/crate_texture.ppm";
+	treeMaterial.texturePath = "textures/tree_bark_1.ppm";
 	treeMaterial.ambient = vec4(0.5, 0.5, 0.5, 1.0);
 	treeMaterial.diffuse = vec4(0.8, 0.8, 0.8, 1.0);
     
@@ -294,8 +299,8 @@ void createTree (vec4 location)
 
 	TreeProperties options = TreeProperties();
 	options.setSeed(treeSeed);
-	options.trunkLength = randFloat(1.0, 4.0);
-	options.initialBranchLength = randFloat(0.3, 0.9);
+	options.trunkLength = randFloat(1.0, 4.5);
+	options.initialBranchLength = randFloat(0.3, 1.8);
 	options.branchFactor = randFloat(2.1, 2.8);
 	options.taperRate = randFloat(0.89, 0.99);
 	options.sweepAmount = randFloat(-0.03, 0.03);
@@ -318,18 +323,12 @@ void createTree (vec4 location)
 // animation/timer callback function
 void update(int value)
 {
-    // "rising and setting the sun"
-    theta++;
-    if (theta > 360)
-    {
-        theta = 0;
-    }
-    
-    float rad = theta/2*3.1459;
-    
-//    lights[1].changeLightProps(vec4(theta, -theta/20, -10, 1), vec4(0.1f, 0.1f, 0.1f, 1), vec4(0.1, 0.1, 0.1, 1), vec4(0.1, 0.1, 0.1, 1));
-//    sun.changeLightProps(vec4(cos(rad), 10, sin(rad) , 1), vec4(0.1f, 0.1f, 0.1f, 1), vec4(0.1, 0.1, 0.1, 1), vec4(0.1, 0.1, 0.1, 1));
-    //sun.direction = vec3(cos(rad), sin(rad), 1);
+	sunAngle += sunSpeed;
+	sun.direction.z = cos(sunAngle);
+	sun.direction.y = sin(sunAngle);
+	sun.direction = normalize(sun.direction);
+	sun.position = sun.direction * sunDist;
+	sun.position.w = 1.0;
 
     
     glutPostRedisplay();
