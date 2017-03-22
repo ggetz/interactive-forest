@@ -11,6 +11,7 @@ void draw();
 void resize(int width, int height);
 void keyboard(unsigned char, int, int);
 void keyBoardSpecial (int key, int xx, int yy);
+void mouseClicked(GLint button, GLint state, GLint x, GLint y);
 void update(int value);
 void close();
 
@@ -30,6 +31,10 @@ GLuint _depthBuffer;
 GLuint _shadowMap;
 GLuint _shadowMapSize = 1024;
 
+// window size
+int HEIGHT = 512;
+int WIDTH = 512;
+
 
 // flags and variables
 int theta;
@@ -43,7 +48,7 @@ int main( int argc, char **argv )
 #else
     glutInitDisplayMode( GLUT_RGBA | GLUT_SINGLE|GLUT_DEPTH);
 #endif
-    glutInitWindowSize( 512, 512 );	//set window size to be 512x512 pixels
+    glutInitWindowSize( WIDTH, HEIGHT );	//set window size to be 512x512 pixels
 
     glutCreateWindow( "Interactive Forest" );
 
@@ -58,8 +63,9 @@ int main( int argc, char **argv )
     glutDisplayFunc( draw );  //REQUIRED.  What to do when it's time to draw
     glutKeyboardFunc( keyboard );  //What to do if a keyboard event is detected
     glutSpecialFunc(keyBoardSpecial);
-    glutTimerFunc(50, update, 50);
-    glutWMCloseFunc(close);
+    glutMouseFunc(mouseClicked); // mouse clicked
+    glutTimerFunc(50, update, 50); // animation, for sun movement
+    glutWMCloseFunc(close); // default close func, make sure to delete resources
     glutReshapeFunc(resize);  //use for recomputing projection matrix on reshape
     glutMainLoop();  //start infinite loop, listening for events
     return 0;
@@ -76,7 +82,8 @@ void init()
     sun.shadow = (vec4(0.5, 0.5, 0.7, 1.0));
     
 	//set up the camera
-	cameras[0].positionCamera(vec4(4, 2, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
+    //vec4(4, 2, 1, 0)
+	cameras[0].positionCamera(vec4(0, 0, 1, 0), vec4(0, 1, 0, 0), vec4(0, 0, -1, 0), vec4(1, 0, 0, 0));
     
     Material m = Material();
     m.texturePath = "grass256by256.ppm";
@@ -91,7 +98,7 @@ void init()
     m.texturePath = "crate_texture.ppm";
     cube = new Cube();
     cube->setMaterial(m);
-    //cube->setPosition(vec4(0, 0.5, 0, 1));
+    cube->setPosition(vec4(-1, -2, 1, 1));
     cube->init();
     
     initShadowMapping();
@@ -169,7 +176,7 @@ void generateShadowMap()
     cube->drawShadowMap(sun);
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0,0, 512, 512);
+    glViewport(0,0, WIDTH, HEIGHT);
 }
 
 
@@ -231,7 +238,27 @@ void keyBoardSpecial (int key, int xx, int yy)
             cout << "MOVED OUT" << endl;
             break;
     }
+}
+
+// mouse click callback function
+void mouseClicked(GLint button, GLint state, GLint x, GLint y)
+{
+    float xCam = (2 * ((float)x / ((float)WIDTH))) - 1;
+    float yCam = (2 * (((float)HEIGHT) - (float)y) / ((float)HEIGHT)) - 1;
     
+    if (button == GLUT_LEFT_BUTTON)
+    {
+        //Square* s1 = new Square(xCam, yCam);
+        //cube->setPosition(vec4(xCam, yCam, 1, 1));
+        cube->setPosition(vec4(1, -2, 1, 1));
+    }
+    else if (button == GLUT_RIGHT_BUTTON)
+    {
+//        Triangle* tri1 = new Triangle(xCam, yCam);
+//        objs.push_back(tri1);
+    }
+    
+    glutPostRedisplay();
 }
 
 //----------------------------------------------------------------------------
