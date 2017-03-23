@@ -5,6 +5,7 @@
 #include "Cube.h"
 #include "Tree.h"
 #include "Skybox.h"
+#include "SnowParticles.h"
 
 #include <stdlib.h> 
 
@@ -43,6 +44,9 @@ vector<Mesh*> meshes;
 GLuint _depthBuffer;
 GLuint _shadowMap;
 GLuint _shadowMapSize = 1024;
+
+SnowParticles* snow;
+float last_time, present_time;
 
 // window size
 int HEIGHT = 800;
@@ -125,6 +129,9 @@ void init()
 	Mesh* treeMesh = tree->createTreeMesh();
 	treeMesh->setMaterial(treeMaterial);
 	meshes.push_back(treeMesh);
+
+	snow = new SnowParticles();
+	snow->setPosition(vec4(2, 4, -2, 1));
     
     // initialize all meshes
 	skybox->init();
@@ -134,6 +141,8 @@ void init()
     }
     
     initShadowMapping();
+
+	snow->initializeParticles();
     
 	
 	glEnable(GL_DEPTH_TEST); //since we're doing 3D graphics, enable the Z-buffer depth test
@@ -169,6 +178,8 @@ void draw( void )
     {
         mesh->draw(camera, sun, _shadowMap);
     }
+
+	snow->drawParticals(camera);
 		
 	glFlush();
 }
@@ -361,6 +372,15 @@ void update(int value)
 	{
 		sunAngle = 0;
 	}
+
+	// update snow particles
+	float dt; 
+	present_time = glutGet(GLUT_ELAPSED_TIME);
+	dt = 0.001*(present_time - last_time);
+
+	snow->updateParticles(dt);
+
+	last_time = present_time;
 
     glutPostRedisplay();
     glutTimerFunc(50, update, value);
