@@ -2,7 +2,6 @@
 #define __DRAWABLE_H__
 #include "Angel.h"
 #include "DirectionalLight.h"
-#include "Spotlight.h"
 #include "Material.h"
 #include "Camera.h"
 
